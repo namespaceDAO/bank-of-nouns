@@ -1,96 +1,64 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "../token/CoinReserve.sol";
+import "./Board.sol";
+import "./Portfolio.sol";
 
-struct Convertible {
-  address payee;
-  uint startCash;
-  uint endCash;
-}
+contract VentureFund is Ownable, Pausable, Board, Portfolio {
+    CoinReserve private _coin;
 
-struct Fund {
-  uint id;
-  address creator;
-  address payee;
-  uint startCash;
-  uint endCash;
-}
+    function _meetsQuorum(uint prop, bool start) internal view returns (bool) {
+        uint startCash; uint endCash;
+        (startCash, endCash) = _getCash(prop);
+        uint ask = start ? startCash : endCash;
+        uint bid = currentTally(prop);
+        return bid > ask;
+    }
 
-abstract contract VentureFund {
-  CoinReserve private _coin;
-  mapping(uint => Fund) private _funds;
+    function _isStartable(uint prop) internal view returns (bool) {
+        return _meetsQuorum(prop, false);
+    }
 
-  event FundCreated(
-    uint id,
-    address payee,
-    uint startCash,
-    uint endCash
-  );
+    function _isCompleted(uint prop) internal view returns (bool) {
+        return _meetsQuorum(prop, true);
+    }
 
-   event PaidStart(
-    uint id,
-    address payee,
-    uint cash
-  );
+    function createProp(PropArgs memory prop) external whenNotPaused {
+        _createProp(prop);
+    }
 
-   event PaidEnd(
-    uint id,
-    address payee,
-    uint cash
-  );
+    function startProp(uint id) external {
+        require(_isStartable(id), "Government: prop cannot be started");
+        _startProp(id);
+    }
 
-  function _addFunding(uint id, Convertible memory note) internal {
-    require(
-      note.startCash > 0 || note.endCash > 0, 
-      "You must request some funding"
-    );
+    function completeProp(uint id) external {
+        bool completed = _isCompleted(id);
+        _completeProp(id, completed);
+    }
+    
+    function castVote(Vote memory vote) external {
+        return _castVote(vote);
+    }
 
-    Fund storage fund = _funds[id];
+    function castManyVotes(Vote[] memory votes) external {
+        for (uint i = 0; i < votes.length; i += 1) {
+            _castVote(votes[i]);
+        }
+    }
 
-    fund.id = id;
-    fund.creator = msg.sender;
-    fund.payee = note.payee;
-    fund.startCash = note.startCash;
-    fund.endCash = note.endCash;
+    function pause() external onlyOwner {
+        _pause();
+    }
 
-    emit FundCreated(
-      fund.id,
-      fund.payee,
-      fund.startCash,
-      fund.endCash
-    );
-  }
+    function unpause() external onlyOwner {
+        _unpause();
+    }
 
-  function _getCash(uint id) internal view returns (
-    uint startCash, 
-    uint endCash
-  ) {
-    Fund storage fund = _funds[id];
-    return (fund.startCash, fund.endCash);
-  }
-
-  function _payStart(uint id) internal {
-    Fund storage fund = _funds[id];
-
-    _coin.transferFromTreasury(fund.payee, fund.startCash);
-
-    emit PaidStart(
-      id, 
-      fund.payee,
-      fund.startCash
-    );
-  }
-
-  function _payEnd(uint id) internal {
-    Fund storage fund = _funds[id];
-
-    _coin.transferFromTreasury(fund.payee, fund.endCash);
-
-    emit PaidEnd(
-      id, 
-      fund.payee, 
-      fund.endCash
-    );
-  }
+    constructor(CoinReserve coin_) {
+        _coin = coin_;
+    }
 }
