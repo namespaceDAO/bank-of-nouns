@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "../token/CoinReserve.sol";
+import "../token/CoinMint.sol";
 
 struct Convertible {
   address payee;
@@ -18,7 +18,7 @@ struct Fund {
 }
 
 abstract contract Payable {
-  CoinReserve private _coin;
+  CoinMint private _coin;
   mapping(uint => Fund) private _funds;
 
   event FundCreated(

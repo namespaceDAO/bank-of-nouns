@@ -43,7 +43,7 @@ describe('AdventureFund', () => {
     await createProp()
     const count2 = await govt.propCount()
     expect(count1).to.equal(0)
-    expect(count2).to.equal(1)
+    expect(count2.toNumber()).to.equal(1)
   })
 
   it('Starts prop', async () => {

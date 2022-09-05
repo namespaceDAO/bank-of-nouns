@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../token/CoinReserve.sol";
+import "../token/CoinMint.sol";
 
-contract MockReserve is CoinReserve {
+contract MockReserve is CoinMint {
     function mint(
         address to, 
         uint coinId, 
@@ -16,5 +16,5 @@ contract MockReserve is CoinReserve {
         return 1;
     }
 
-    constructor(string memory baseURI_) CoinReserve(baseURI_) {}    
+    constructor(string memory baseURI_) CoinMint(baseURI_) {}    
 }

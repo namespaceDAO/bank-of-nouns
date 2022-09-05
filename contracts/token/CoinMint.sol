@@ -4,7 +4,7 @@ pragma solidity ^0.8.10;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./Treasury.sol";
 
-abstract contract CoinReserve is ERC1155, Treasury {
+abstract contract CoinMint is ERC1155, Treasury {
     uint private _totalSupply;
     mapping(uint => uint) _totalSupplies;
 

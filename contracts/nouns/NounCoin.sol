@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../token/CoinReserve.sol";
+import "../token/CoinMint.sol";
 import "../token/Claimable.sol";
 import "./NounsDescriptor.sol";
 
-contract NounCoin is Claimable, CoinReserve {
+contract NounCoin is Claimable, CoinMint {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
 
@@ -67,7 +67,6 @@ contract NounCoin is Claimable, CoinReserve {
             return value;  // seppuku mint;
         }
 
-
         uint avgSupply = totalSupply / heads;
         uint tokenSupply = _totalSupplies[coinId];
 
@@ -85,7 +84,7 @@ contract NounCoin is Claimable, CoinReserve {
     constructor(
         string memory baseURI_,
         NounsDescriptor desc_
-    ) CoinReserve(baseURI_) { 
+    ) CoinMint(baseURI_) { 
         _desc = desc_; 
     }
 }

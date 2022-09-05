@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "../token/CoinReserve.sol";
+import "../token/CoinMint.sol";
 
 struct Vote {
     uint id;
@@ -12,7 +12,7 @@ struct Vote {
 }
 
 abstract contract Board {
-    CoinReserve private _coin;
+    CoinMint private _coin;
 
     mapping(address => mapping(uint => Vote)) _votes;
     mapping(uint => uint) _totalSupport;
