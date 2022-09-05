@@ -2,11 +2,11 @@
 pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "../treasury/CoinReserve.sol";
-import "../utils/Origin.sol";
-import "./BallotBox.sol";
+import "./CoinBox.sol";
 
-contract Government is BallotBox, Pausable, Origin {
+contract Government is CoinBox, Pausable, Ownable {
     CoinReserve private _coin;
 
     function createProp(PropArgs memory prop) external whenNotPaused {
@@ -33,18 +33,15 @@ contract Government is BallotBox, Pausable, Origin {
         }
     }
 
-    function pause() external onlyOrigin {
+    function pause() external onlyOwner {
         _pause();
     }
 
-    function unpause() external onlyOrigin {
+    function unpause() external onlyOwner {
         _unpause();
     }
 
-    constructor(
-        address origin_,
-        CoinReserve coin_
-    ) Origin(origin_) {
+    constructor(CoinReserve coin_) {
         _coin = coin_;
     }
 }

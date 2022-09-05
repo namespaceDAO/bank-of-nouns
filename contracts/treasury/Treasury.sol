@@ -21,7 +21,7 @@ contract Treasury is Ownable {
     modifier onlyTreasurer() {
         require(
             _treasurer == msg.sender && _treasurer != address(0), 
-            "Caller is not the treasurer"
+            "Treasury: caller is not the treasurer"
         );
         _;
     }
@@ -36,21 +36,25 @@ contract Treasury is Ownable {
     ) external onlyTreasurer {
         require(
             treasuryBalance() >= amount, 
-            "Amount exceeds treasury balance"
+            "Treasury: transfer exceeds treasury balance"
         );
 
         (bool success, ) = to.call{value:amount}("");
-        require(success, "Transfer failed");
+        require(success, "Treasury: transfer failed");
     }
 
-    function _changeTreasurer(address to) external onlyOwner {
-        require(!_locked, "Treasury is locked");
+    function changeTreasurer(address to) external onlyOwner {
+        require(!_locked, "Treasury: treasury is locked");
         emit ChangeTreasurer(_treasurer, to);
         _treasurer = to;
     }
 
-    function _lockTreasury() external onlyOwner {
+    function lockTreasury() external onlyOwner {
         _locked = true;
         emit LockTreasury(_treasurer);
+    }
+
+    constructor() {
+        _treasurer = owner();
     }
 }

@@ -12,7 +12,7 @@ struct Vote {
     bool support;
 }
 
-abstract contract BallotBox is PropHouse {
+abstract contract CoinBox is PropHouse {
     CoinReserve private _coin;
 
     mapping(address => mapping(uint => Vote)) _votes;
