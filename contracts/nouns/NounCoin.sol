@@ -9,6 +9,22 @@ contract NounCoin is Claimable, CoinReserve {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
 
+    function descriptor() public view returns (NounsDescriptor) {
+        return _desc;
+    }
+
+    function ampl() public view returns (uint) {
+        return _ampl;
+    }
+
+    function setAmpl(uint ampl_) external onlyOwner {
+        _ampl = ampl_;
+    }
+
+    function setDescriptor(NounsDescriptor desc_) external onlyOwner {
+        _desc = desc_;
+    }
+
     function mint(
         address to, 
         uint coinId, 
@@ -64,22 +80,6 @@ contract NounCoin is Claimable, CoinReserve {
         }
 
         return value * avgSupply / tokenSupply;
-    }
-
-    function descriptor() public view returns (NounsDescriptor) {
-        return _desc;
-    }
-
-    function ampl() public view returns (uint) {
-        return _ampl;
-    }
-
-    function setAmpl(uint ampl_) external onlyOwner {
-        _ampl = ampl_;
-    }
-
-    function setDescriptor(NounsDescriptor desc_) external onlyOwner {
-        _desc = desc_;
     }
 
     constructor(
