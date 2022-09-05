@@ -4,7 +4,7 @@ pragma solidity ^0.8.10;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./Treasury.sol";
 
-abstract contract TreasuryCoin is Treasury, ERC1155 {
+abstract contract CoinReserve is ERC1155, Treasury {
     uint private _totalSupply;
     mapping(uint => uint) _totalSupplies;
 
@@ -21,21 +21,16 @@ abstract contract TreasuryCoin is Treasury, ERC1155 {
         return _totalSupplies[coinId];
     }
 
-    function mint(address to, uint coinId) external payable {
-        uint amount = conversionRate(coinId, msg.value);
-
-        bytes memory data;
-        _mint(to, coinId, amount, data);
-
-        _totalSupplies[coinId] += amount;
+    function _mintCoin(
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) internal {
+        _mint(to, id, amount, data);
+        _totalSupplies[id] += amount;
         _totalSupply += amount;
     }
 
-    constructor(
-        string memory baseURI_,
-        address adminAddress_, 
-        address originAddress_
-    ) 
-    Treasury(adminAddress_, originAddress_)
-    ERC1155(baseURI_) {}  
+    constructor(string memory baseURI_) ERC1155(baseURI_) {}  
 }

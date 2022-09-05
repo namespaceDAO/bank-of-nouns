@@ -1,15 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../treasury/TreasuryCoin.sol";
+import "../treasury/CoinReserve.sol";
 import "./NounsDescriptor.sol";
 
-contract NounCoin is TreasuryCoin {
+contract NounCoin is CoinReserve {
     uint private _amplBPS = 20000;
     NounsDescriptor private _desc;
 
+    function mint(
+        address to, 
+        uint coinId, 
+        bytes memory data
+    ) external payable {
+        uint amount = conversionRate(coinId, msg.value);
+        _mintCoin(to, coinId, amount, data);
+    }
+
     function conversionRate(
-        uint coinId, uint value
+        uint coinId, 
+        uint value
     ) public view override returns (uint) {
         uint heads = _desc.headCount();
         require(heads > 0 && coinId <= heads, "Not enough heads");
@@ -43,20 +53,18 @@ contract NounCoin is TreasuryCoin {
         return _amplBPS;
     }
 
-    function setAmpl(uint amplBPS_) external onlyOrigin {
+    function setAmpl(uint amplBPS_) external onlyOwner {
         _amplBPS = amplBPS_;
     }
 
-    function setDescriptor(NounsDescriptor desc_) external onlyOrigin {
+    function setDescriptor(NounsDescriptor desc_) external onlyOwner {
         _desc = desc_;
     }
 
     constructor(
-        NounsDescriptor desc_,
         string memory baseURI_,
-        address adminAddress_, 
-        address originAddress_
-    ) TreasuryCoin(baseURI_, adminAddress_, originAddress_) { 
+        NounsDescriptor desc_
+    ) CoinReserve(baseURI_) { 
         _desc = desc_; 
     }    
 }

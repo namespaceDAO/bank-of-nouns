@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "../treasury/TreasuryCoin.sol";
+import "../treasury/CoinReserve.sol";
 
 struct Convertible {
   address payee;
@@ -18,7 +18,7 @@ struct Fund {
 }
 
 abstract contract VentureFund {
-  TreasuryCoin private _coin;
+  CoinReserve private _coin;
   mapping(uint => Fund) private _funds;
 
   event FundCreated(

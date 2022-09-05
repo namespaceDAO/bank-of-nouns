@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "../treasury/TreasuryCoin.sol";
+import "../treasury/CoinReserve.sol";
 import "./PropHouse.sol";
 
 struct Vote {
@@ -13,7 +13,7 @@ struct Vote {
 }
 
 abstract contract BallotBox is PropHouse {
-    TreasuryCoin private _coin;
+    CoinReserve private _coin;
 
     mapping(address => mapping(uint => Vote)) _votes;
     mapping(uint => uint) _totalSupport;

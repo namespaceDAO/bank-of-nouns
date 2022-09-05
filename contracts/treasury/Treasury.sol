@@ -1,47 +1,56 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "../utils/Origin.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Treasury is Origin {
+contract Treasury is Ownable {
     bool private _locked;
-    address private _treasury;
+    address private _treasurer;  // authorized operator
 
-    event MoveTreasury(address indexed previousAddress, address indexed newAddress);
-    event LockTreasury(address indexed provenance);
+    event LockTreasury(address provenance);
+    event ChangeTreasurer(address indexed from, address indexed to);
 
-    modifier onlyAdmin() {
-        bool active = _treasury == msg.sender && _treasury != address(0);
-        require(active, "Caller is not the treasury");
+    receive() external payable {}
+
+    fallback() external payable {}
+
+    function treasuryBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+
+    modifier onlyTreasurer() {
+        require(
+            _treasurer == msg.sender && _treasurer != address(0), 
+            "Caller is not the treasurer"
+        );
         _;
     }
 
-    function transferFromTreasury(address to, uint amount) external onlyAdmin {
-        require(address(this).balance >= amount, "Amount exceeds treasury balance");
-        payable(to).transfer(amount);
+    function treasurerAddress() public view returns (address) {
+        return _treasurer;
     }
 
-    function adminAddress() public view returns (address) { 
-        return _treasury; 
-    }    
+    function transferFromTreasury(
+        address to, 
+        uint amount
+    ) external onlyTreasurer {
+        require(
+            treasuryBalance() >= amount, 
+            "Amount exceeds treasury balance"
+        );
 
-    function moveTreasury(address to) external onlyOrigin {
-        require(!_locked, "Treasury has been locked");
-        address from = _treasury;
-        _treasury = to;
-        emit MoveTreasury(from, to);
+        (bool success, ) = to.call{value:amount}("");
+        require(success, "Transfer failed");
     }
 
-    function lockTreasury() external onlyOrigin {
+    function _changeTreasurer(address to) external onlyOwner {
+        require(!_locked, "Treasury is locked");
+        emit ChangeTreasurer(_treasurer, to);
+        _treasurer = to;
+    }
+
+    function _lockTreasury() external onlyOwner {
         _locked = true;
-        address oa = originAddress();
-        emit LockTreasury(oa);
-    }
-
-    constructor(
-        address adminAddress_, 
-        address originAddress_
-    ) Origin(originAddress_) {
-        _treasury = adminAddress_;
+        emit LockTreasury(_treasurer);
     }
 }
