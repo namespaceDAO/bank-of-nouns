@@ -44,7 +44,7 @@ contract NounCoin is CoinReserve {
         uint value
     ) public view override returns (uint) {
         uint heads = _desc.headCount();
-        require(heads > 0 && coinId <= heads, "Not enough heads");
+        require(heads > 0 && coinId < heads, "Not enough heads");
 
         uint totalSupply = totalSupply();
         if (totalSupply == 0) {
@@ -69,9 +69,9 @@ contract NounCoin is CoinReserve {
 
     function originClaim(address to, uint amount) external onlyOwner {
         uint max = _totalMinted / 10 - _originClaim;
-        require(amount <= max, "CoinReserve: origin claim is too large");
+        require(amount <= max, "NounCoin: origin claim is too large");
         (bool success, ) = to.call{value:amount}("");
-        require(success, "CoinReserve: transfer failed");
+        require(success, "NounCoin: transfer failed");
         _originClaim += amount;
     }
 
