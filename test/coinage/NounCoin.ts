@@ -15,10 +15,10 @@ describe('NounCoin', () => {
 
   it('Create NOUN COIN with getters', async () => {
     [origin, minter1, minter2, minter3] = await ethers.getSigners()
-    const HuntDescriptor = await ethers.getContractFactory('HuntDescriptor')
+    const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
     const NounCoin = await ethers.getContractFactory('NounCoin')
 
-    const hunt = await HuntDescriptor.deploy(2)
+    const hunt = await MockDescriptor.deploy(2)
 
     coin = await NounCoin.deploy(COIN_URI, hunt.address)
 

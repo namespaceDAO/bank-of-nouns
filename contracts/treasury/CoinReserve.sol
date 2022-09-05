@@ -27,6 +27,7 @@ abstract contract CoinReserve is ERC1155, Treasury {
         uint256 amount,
         bytes memory data
     ) internal {
+        require(amount > 0, "CoinTreasury: must mint some coins");
         _mint(to, id, amount, data);
         _totalSupplies[id] += amount;
         _totalSupply += amount;

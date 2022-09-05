@@ -3,17 +3,15 @@ import { expect } from 'chai'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Contract } from 'ethers'
 
-const parseEther = ethers.utils.parseEther
-
 describe('Treasury', () => {
   let origin: SignerWithAddress
   let treasurer: SignerWithAddress
-  let snake: SignerWithAddress
-  let charon: SignerWithAddress
+  let alice: SignerWithAddress
+  let bob: SignerWithAddress
   let treasury: Contract
 
   it('Create treasury', async () => {
-    [origin, treasurer, snake, charon] = await ethers.getSigners()
+    [origin, treasurer, alice, bob] = await ethers.getSigners()
     const Treasury = await ethers.getContractFactory('Treasury')
     treasury = await Treasury.deploy()
 
@@ -38,13 +36,13 @@ describe('Treasury', () => {
   })
 
   it('Transfers funds for treasurer', async () => {
-    const balance1 = await charon.getBalance()
+    const balance1 = await bob.getBalance()
     const treasury1 = await treasury.treasuryBalance()
 
     const transfer = ethers.utils.parseEther(`${Math.random()}`)
-    await treasury.connect(treasurer).transferFromTreasury(charon.address, transfer)
+    await treasury.connect(treasurer).transferFromTreasury(bob.address, transfer)
 
-    const balance2 = await charon.getBalance()
+    const balance2 = await bob.getBalance()
     const treasury2 = await treasury.treasuryBalance()
     expect(balance2.sub(balance1)).to.equal(transfer)
     expect(treasury1.sub(transfer)).to.equal(treasury2)
@@ -61,13 +59,13 @@ describe('Treasury', () => {
   it('Fails to transfer funds when not treasurer', async () => {
     const value = ethers.utils.parseEther(`${Math.random()}`)
     await expect(
-      treasury.transferFromTreasury(charon.address, value)
+      treasury.transferFromTreasury(bob.address, value)
     ).to.revertedWith('Treasury: caller is not the treasurer')
   })
 
   it('Fails to change treasurer', async () => {
     await expect(
-      treasury.connect(snake).changeTreasurer(snake.address)
+      treasury.connect(alice).changeTreasurer(alice.address)
     ).to.revertedWith('Ownable: caller is not the owner')
   })
 
@@ -86,6 +84,6 @@ describe('Treasury', () => {
 
   it('Transfers when locked', async () => {
     const transfer = ethers.utils.parseEther(`${Math.random() / 10}`)
-    await treasury.connect(treasurer).transferFromTreasury(charon.address, transfer)
+    await treasury.connect(treasurer).transferFromTreasury(bob.address, transfer)
   })
 })
