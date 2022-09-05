@@ -3,7 +3,7 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../governance/CoinReserve.sol";
+import "../token/CoinReserve.sol";
 import "./CoinBox.sol";
 
 contract Government is CoinBox, Pausable, Ownable {

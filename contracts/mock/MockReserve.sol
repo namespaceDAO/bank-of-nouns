@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../governance/CoinReserve.sol";
+import "../token/CoinReserve.sol";
 
 contract MockReserve is CoinReserve {
     function mint(

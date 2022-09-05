@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../governance/CoinReserve.sol";
+import "../token/CoinReserve.sol";
 import "./NounsDescriptor.sol";
 
 contract NounCoin is CoinReserve {
@@ -66,5 +66,5 @@ contract NounCoin is CoinReserve {
         NounsDescriptor desc_
     ) CoinReserve(baseURI_) { 
         _desc = desc_; 
-    }    
+    }
 }
