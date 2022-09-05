@@ -41,7 +41,7 @@ describe('NounCoin', () => {
     expect(balance1.add(claim1)).to.equal(balance2)
     await expect(
       coin.originClaim(bob.address, claim2)
-    ).to.revertedWith('NounCoin: origin claim is too large')
+    ).to.revertedWith('Claimable: origin claim is too large')
     await coin.originClaim(bob.address, claim1)
   })
 
@@ -51,7 +51,7 @@ describe('NounCoin', () => {
     await coin.mint(alice.address, 0, 0, { value })
     await expect(
       coin.originClaim(bob.address, claim1)
-    ).to.revertedWith('NounCoin: origin claim is too large')
+    ).to.revertedWith('Claimable: origin claim is too large')
   })
 
   it('Mints 2 to 1', async () => {

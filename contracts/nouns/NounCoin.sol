@@ -2,13 +2,12 @@
 pragma solidity ^0.8.10;
 
 import "../token/CoinReserve.sol";
+import "../token/Claimable.sol";
 import "./NounsDescriptor.sol";
 
-contract NounCoin is CoinReserve {
+contract NounCoin is Claimable, CoinReserve {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
-    uint private _totalMinted;
-    uint private _originClaim;
 
     function mint(
         address to, 
@@ -18,7 +17,7 @@ contract NounCoin is CoinReserve {
         require(msg.value > 0, "NounCoin: must mint some coins");
         uint amount = conversionRate(coinId, msg.value);
         _mint(to, coinId, amount, data);
-        _totalMinted += msg.value;
+        _updateTally(msg.value);
     }
 
     function mintBatch(
@@ -36,7 +35,7 @@ contract NounCoin is CoinReserve {
         }
 
         _mintBatch(to, ids, amounts, data);
-        _totalMinted += msg.value;
+        _updateTally(msg.value);
     }
 
     function conversionRate(
@@ -88,13 +87,5 @@ contract NounCoin is CoinReserve {
         NounsDescriptor desc_
     ) CoinReserve(baseURI_) { 
         _desc = desc_; 
-    }
-
-    function originClaim(address to, uint amount) external onlyOwner {
-        uint max = _totalMinted / 10 - _originClaim;
-        require(amount <= max, "NounCoin: origin claim is too large");
-        (bool success, ) = to.call{value:amount}("");
-        require(success, "NounCoin: transfer failed");
-        _originClaim += amount;
     }
 }
