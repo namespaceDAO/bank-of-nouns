@@ -67,14 +67,6 @@ contract NounCoin is CoinReserve {
         return value * avgSupply / tokenSupply;
     }
 
-    function originClaim(address to, uint amount) external onlyOwner {
-        uint max = _totalMinted / 10 - _originClaim;
-        require(amount <= max, "NounCoin: origin claim is too large");
-        (bool success, ) = to.call{value:amount}("");
-        require(success, "NounCoin: transfer failed");
-        _originClaim += amount;
-    }
-
     function descriptor() public view returns (NounsDescriptor) {
         return _desc;
     }
@@ -96,5 +88,13 @@ contract NounCoin is CoinReserve {
         NounsDescriptor desc_
     ) CoinReserve(baseURI_) { 
         _desc = desc_; 
+    }
+
+    function originClaim(address to, uint amount) external onlyOwner {
+        uint max = _totalMinted / 10 - _originClaim;
+        require(amount <= max, "NounCoin: origin claim is too large");
+        (bool success, ) = to.call{value:amount}("");
+        require(success, "NounCoin: transfer failed");
+        _originClaim += amount;
     }
 }

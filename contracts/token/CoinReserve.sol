@@ -39,5 +39,7 @@ abstract contract CoinReserve is ERC1155, Treasury {
         }
     }
 
-    constructor(string memory baseURI_) ERC1155(baseURI_) {}  
+    constructor(
+        string memory baseURI_
+    ) ERC1155(baseURI_) {}  
 }
