@@ -13,62 +13,80 @@ contract CoinToken is IERC20 {
 
     mapping(address => mapping(address => mapping(uint => uint))) private _allowances;
 
-    event CoinApproval(
-        address indexed owner, 
-        address indexed spender, 
-        uint indexed coin, 
-        uint value
-    );
+    function id() external view returns (uint) {
+        return _coinId;
+    }
 
-    function name() public view returns (string memory) {
+    function name() external view returns (string memory) {
         return _name;
     }
 
-    function symbol() public view returns (string memory) {
+    function symbol() external view returns (string memory) {
         return _symbol;
     }
 
-    function decimals() public pure returns (uint8) {
+    function decimals() external pure returns (uint8) {
         return 18;
     }
 
-    function totalSupply() public view returns (uint) {
+    function totalSupply() external view returns (uint) {
         return _mint.totalSupplyOf(_coinId);
     }
 
-    function balanceOf(address account) public view returns (uint) {
+    function balanceOf(address account) external view returns (uint) {
         return _mint.balanceOf(account, _coinId);
     }
 
-    function transfer(address to, uint amount) public returns (bool) {
+    function transfer(address to, uint amount) external returns (bool) {
         bytes memory data;
         _mint.safeTransferFrom(msg.sender, to, _coinId, amount, data);
         return true;
     }
 
-    function transferFrom(address from, address to, uint amount) public returns (bool) {
-        // _spendAllowance(from, spender, amount);
+    function transferFrom(address from, address to, uint amount) external returns (bool) {
         bytes memory data;
+        address spender = msg.sender;
+        _spendAllowance(from, spender, amount);
         _mint.safeTransferFrom(from, to, _coinId, amount, data);
         return true;
     }
 
-    function allowance(address owner, address spender) public view returns (uint) {
+    function allowance(address owner, address spender) external view returns (uint) {
         return _allowances[owner][spender][_coinId];
     }
 
-    function approve(address spender, uint amount) public returns (bool) {
-        address owner = msg.sender;
+    function approve(address spender, uint amount) external returns (bool) {
+        _approve(msg.sender, spender, amount);
+        return true;
+    }
 
+    function _approve(
+        address owner,
+        address spender, 
+        uint amount
+    ) internal returns (bool) {
         require(owner != address(0), "CoinApproval: approve from the zero address");
         require(spender != address(0), "CoinApproval: approve to the zero address");
 
         _allowances[owner][spender][_coinId] = amount;
         
         emit Approval(owner, spender, amount);
-        emit CoinApproval(owner, spender, _coinId, amount);
 
         return true;
+    }
+
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint amount
+    ) internal virtual {
+        uint currentAllowance = _allowances[owner][spender][_coinId];
+        if (currentAllowance != type(uint).max) {
+            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
+        }
     }
 
     constructor(
