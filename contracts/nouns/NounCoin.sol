@@ -17,7 +17,7 @@ contract NounCoin is Claimable, CoinReserve {
         require(msg.value > 0, "NounCoin: must mint some coins");
         uint amount = conversionRate(coinId, msg.value);
         _mint(to, coinId, amount, data);
-        _updateTally(msg.value);
+        _addValue(msg.value);
     }
 
     function mintBatch(
@@ -35,7 +35,7 @@ contract NounCoin is Claimable, CoinReserve {
         }
 
         _mintBatch(to, ids, amounts, data);
-        _updateTally(msg.value);
+        _addValue(msg.value);
     }
 
     function conversionRate(

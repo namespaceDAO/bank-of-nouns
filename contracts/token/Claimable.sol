@@ -7,7 +7,7 @@ contract Claimable is Origin {
     uint private _totalMinted;
     uint private _originClaim;
 
-    function _updateTally(uint amount) internal {
+    function _addValue(uint amount) internal {
         _totalMinted += amount;
     }
 
