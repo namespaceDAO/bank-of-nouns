@@ -5,7 +5,7 @@ import { Contract } from 'ethers'
 
 const parseEther = ethers.utils.parseEther
 
-describe('VentureFund', () => {
+describe('AdventureFund', () => {
   let origin: SignerWithAddress
   let alice: SignerWithAddress
   let bob: SignerWithAddress
@@ -31,7 +31,7 @@ describe('VentureFund', () => {
     [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
     const NounCoin = await ethers.getContractFactory('NounCoin')
-    const VentureFund = await ethers.getContractFactory('VentureFund')
+    const VentureFund = await ethers.getContractFactory('AdventureFund')
     descriptor = await MockDescriptor.deploy(2)
     coin = await NounCoin.deploy(COIN_URI, descriptor.address)
 

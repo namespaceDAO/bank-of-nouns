@@ -67,16 +67,16 @@ contract NounCoin is Claimable, CoinReserve {
             return value;  // seppuku mint;
         }
 
-        uint amp = _ampl / 10000;
+
         uint avgSupply = totalSupply / heads;
         uint tokenSupply = _totalSupplies[coinId];
 
-        if (tokenSupply > avgSupply * amp) {
-            return value / amp;
+        if (tokenSupply > avgSupply * _ampl / 10000) {
+            return value / (_ampl / 10000);
         }
 
-        if (avgSupply > tokenSupply * amp) {
-            return value * amp;
+        if (avgSupply > tokenSupply * _ampl / 10000) {
+            return value * _ampl / 10000;
         }
 
         return value * avgSupply / tokenSupply;

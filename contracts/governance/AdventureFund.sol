@@ -7,7 +7,8 @@ import "../token/CoinReserve.sol";
 import "./Board.sol";
 import "./Portfolio.sol";
 
-contract VentureFund is Ownable, Pausable, Board, Portfolio {
+// What being has four legs, then two, and then three?
+contract AdventureFund is Ownable, Pausable, Board, Portfolio {
     CoinReserve private _coin;
 
     function _meetsQuorum(uint prop, bool start) internal view returns (bool) {
