@@ -14,13 +14,13 @@ contract Government is CoinBox, Pausable, Ownable {
     }
 
     function startProp(uint id) external {
-        if (_meetsQuorum(id, true)) {
-            _startProp(id);
-        }
+        require(_isStartable(id), "Government: prop cannot be started");
+        _startProp(id);
     }
 
     function completeProp(uint id) external {
-        _completeProp(id, _meetsQuorum(id, false));
+        bool completed = _isCompleted(id);
+        _completeProp(id, completed);
     }
     
     function castVote(Vote memory vote) external {

@@ -35,6 +35,14 @@ abstract contract CoinBox is PropHouse {
         return bid > ask;
     }
 
+    function _isStartable(uint prop) internal view returns (bool) {
+        return _meetsQuorum(prop, false);
+    }
+
+    function _isCompleted(uint prop) internal view returns (bool) {
+        return _meetsQuorum(prop, true);
+    }
+
     function _requireBalance(address owner, uint coinId, uint amount) internal view {
         require(
             _coin.balanceOf(owner, coinId) >= amount, 
