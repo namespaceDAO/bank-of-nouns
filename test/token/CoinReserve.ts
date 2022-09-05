@@ -52,11 +52,4 @@ describe('CoinReserve', () => {
     expect(supplyB).to.equal(amountB)
     expect(totalSupply).to.equal(supplyA.add(supplyB))
   })
-
-  it('Fails to mint zero coins', async () => {
-    const amount = parseEther('0')
-    await expect(
-      reserve.mint(alice.address, 1, 0, { value: amount })
-    ).to.revertedWith('CoinReserve: must mint some coins')
-  })
 })

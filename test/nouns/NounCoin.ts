@@ -7,41 +7,74 @@ const parseEther = ethers.utils.parseEther
 
 describe('NounCoin', () => {
   let origin: SignerWithAddress
-  let minter1: SignerWithAddress
-  let minter2: SignerWithAddress
-  let minter3: SignerWithAddress
+  let alice: SignerWithAddress
+  let bob: SignerWithAddress
   let coin: Contract
+  let descriptor: Contract
   const COIN_URI = 'https://nouns.express/_/api/tokens/{id}.json'
 
-  it('Create NOUN COIN with getters', async () => {
-    [origin, minter1, minter2, minter3] = await ethers.getSigners()
+  beforeEach(async () => {
+    [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
     const NounCoin = await ethers.getContractFactory('NounCoin')
-
-    const hunt = await MockDescriptor.deploy(2)
-
-    coin = await NounCoin.deploy(COIN_URI, hunt.address)
-
-    const balance = await coin.balanceOf(origin.address, 1)
-    expect(balance.toNumber()).to.equal(0)
+    descriptor = await MockDescriptor.deploy(2)
+    coin = await NounCoin.deploy(COIN_URI, descriptor.address)
   })
 
-  it('Mints NOUN COIN', async () => {
-    await coin.mint(minter1.address, 1, 0, { value: parseEther('0.001') })
-    await coin.mint(minter2.address, 2, 0, { value: parseEther('5') })
+  it('Create NOUN COIN with getters', async () => {
+    const desc = await coin.descriptor()
+    const ampl = await coin.ampl()
+    expect(desc).to.equal(descriptor.address)
+    expect(ampl).to.equal(20000)
+  })
 
-    const balance1 = await coin.balanceOf(minter1.address, 1)
-    const balance2 = await coin.balanceOf(minter2.address, 2)
+  it('Mints 2 to 1', async () => {
+    const value = parseEther('1')
+    await coin.mint(alice.address, 1, 0, { value })
+    await coin.mint(bob.address, 2, 0, { value })
 
-    expect(balance1).to.equal(parseEther('0.001'))
-    expect(balance2).to.equal(parseEther('10'))
+    const balanceA = await coin.balanceOf(alice.address, 1)
+    const balanceB = await coin.balanceOf(bob.address, 2)
 
-    const amount3 = ethers.utils.parseEther('1')
-    await coin.mint(minter3.address, 1, 0, { value: amount3 })
-    const balance3 = await coin.balanceOf(minter3.address, 1)
+    expect(balanceA).to.equal(value)
+    expect(balanceB).to.equal(value.mul(2))
+  })
 
-    expect(balance3).to.equal(parseEther('2'))
+  it('Mints 3 to 1', async () => {
+    const value = parseEther('1')
 
-    console.log({ balance1, balance2, balance3 })
+    await coin.mintBatch(alice.address, [1, 2], 0, { value })
+
+    const balanceA = await coin.balanceOf(alice.address, 1)
+    const balanceB = await coin.balanceOf(alice.address, 2)
+
+    expect(balanceA).to.equal(value.div(2))
+    expect(balanceB).to.equal(value.div(2))
+  })
+
+  it('Fails to mint with incorrect number of heads', async () => {
+    const value = parseEther('1')
+
+    await expect(
+      coin.mint(alice.address, 3, 0, { value })
+    ).to.revertedWith('Not enough heads')
+  })
+
+  it('Empty conversion rates', async () => {
+    const value = parseEther('1')
+    const rate1 = await coin.conversionRate(1, value)
+    const rate2 = await coin.conversionRate(2, value)
+    expect(rate1).to.equal(value) // 1 = 1
+    expect(rate2).to.equal(value) // 1 = 1
+  })
+
+  it('Fails to mint zero coins', async () => {
+    const amount = parseEther('0')
+    await expect(
+      coin.mint(alice.address, 1, 0, { value: amount })
+    ).to.revertedWith('NounCoin: must mint some coins')
+    await expect(
+      coin.mintBatch(alice.address, [1, 2], 0, { value: amount })
+    ).to.revertedWith('NounCoin: must mint some coins')
   })
 })

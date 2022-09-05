@@ -9,7 +9,7 @@ contract MockReserve is CoinReserve {
         uint coinId, 
         bytes memory data
     ) external payable {
-        _mintCoin(to, coinId, msg.value, data);
+        _mint(to, coinId, msg.value, data);
     }
 
     function conversionRate(uint, uint) override public pure returns (uint) {
