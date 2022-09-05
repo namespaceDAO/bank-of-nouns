@@ -1,0 +1,1 @@
+cloc $1 --exclude-dir=node_modules,typechain-types --not-match-f="(yarn\.lock|package\.json|package\-lock\.json|hardhat\.config\.ts|.+\.d\.ts|.+.json|.+.yaml|.+.yml)" 
