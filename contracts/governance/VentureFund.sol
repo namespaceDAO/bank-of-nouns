@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import "../treasury/CoinReserve.sol";
+import "../governance/CoinReserve.sol";
 
 struct Convertible {
   address payee;
