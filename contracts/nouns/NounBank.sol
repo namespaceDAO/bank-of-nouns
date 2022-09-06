@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../token/Ledger.sol";
+import "../token/Bank.sol";
 import "../token/Claimable.sol";
 import "./NounsDescriptor.sol";
 
 // TODO: deep fry the horse
 
-contract NounCoin is Claimable, Ledger {
+contract NounBank is Claimable, Bank {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
 
@@ -73,7 +73,7 @@ contract NounCoin is Claimable, Ledger {
         }
 
         uint avgSupply = totalSupply / heads;
-        uint tokenSupply = _totalSupplies[coinId];
+        uint tokenSupply = totalSupplyOf(coinId);
 
         if (tokenSupply > avgSupply * _ampl / 10000) {
             return value / (_ampl / 10000);
@@ -89,7 +89,7 @@ contract NounCoin is Claimable, Ledger {
     constructor(
         string memory baseURI_,
         NounsDescriptor desc_
-    ) Ledger(baseURI_) { 
+    ) Bank(baseURI_) { 
         _desc = desc_; 
     }
 }

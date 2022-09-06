@@ -6,7 +6,7 @@ import { formatEther } from 'ethers/lib/utils'
 
 const parseEther = ethers.utils.parseEther
 
-describe('NounCoin', () => {
+describe('NounBank', () => {
   let origin: SignerWithAddress
   let alice: SignerWithAddress
   let bob: SignerWithAddress
@@ -18,9 +18,9 @@ describe('NounCoin', () => {
   beforeEach(async () => {
     [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
-    const NounCoin = await ethers.getContractFactory('NounCoin')
+    const NounBank = await ethers.getContractFactory('NounBank')
     descriptor = await MockDescriptor.deploy(2)
-    coin = await NounCoin.deploy(COIN_URI, descriptor.address)
+    coin = await NounBank.deploy(COIN_URI, descriptor.address)
   })
 
   it('Create NOUN COIN with getters', async () => {
@@ -155,7 +155,7 @@ describe('NounCoin', () => {
   })
 })
 
-describe('NounCoin games 1', () => {
+describe('NounBank games 1', () => {
   let origin: SignerWithAddress
   let alice: SignerWithAddress
   let bob: SignerWithAddress
@@ -167,9 +167,9 @@ describe('NounCoin games 1', () => {
   before(async () => {
     [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
-    const NounCoin = await ethers.getContractFactory('NounCoin')
+    const NounBank = await ethers.getContractFactory('NounBank')
     descriptor = await MockDescriptor.deploy(200)
-    coin = await NounCoin.deploy(COIN_URI, descriptor.address)
+    coin = await NounBank.deploy(COIN_URI, descriptor.address)
   })
 
   const randomizeAmpl = async () => {

@@ -4,7 +4,8 @@ pragma solidity ^0.8.10;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./Treasury.sol";
 
-abstract contract Ledger is ERC1155, Treasury {
+abstract contract Ledger is Treasury, ERC1155 {
+    uint private _bank;
     uint private _totalSupply;
     mapping(uint => uint) _totalSupplies;
     mapping(address => mapping(address => mapping(uint => uint))) private _allowances;
@@ -20,6 +21,13 @@ abstract contract Ledger is ERC1155, Treasury {
         uint coinId, 
         uint amount
     ) virtual public view returns (uint);
+
+    function deployedTokenTransfer(
+        address from, 
+        address to, 
+        uint coinId, 
+        uint amount
+    ) virtual external;
 
     function totalSupply() public view returns (uint) {
         return _totalSupply;
@@ -97,8 +105,8 @@ abstract contract Ledger is ERC1155, Treasury {
         uint coinId,
         uint amount
     ) internal virtual {
-        uint256 currentAllowance = _allowances[account][spender][coinId];
-        if (currentAllowance != type(uint256).max) {
+        uint currentAllowance = _allowances[account][spender][coinId];
+        if (currentAllowance != type(uint).max) {
             require(currentAllowance >= amount, "Ledger: insufficient allowance");
             unchecked {
                 _approve(account, spender, coinId, currentAllowance - amount);

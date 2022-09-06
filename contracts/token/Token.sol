@@ -36,14 +36,12 @@ contract Token is IERC20 {
     }
 
     function transfer(address to, uint amount) external returns (bool) {
-        bytes memory data;
-        _ledger.safeTransferFrom(msg.sender, to, _coinId, amount, data);
+        _ledger.deployedTokenTransfer(msg.sender, to, _coinId, amount);
         return true;
     }
 
     function transferFrom(address from, address to, uint amount) external returns (bool) {
-        bytes memory data;
-        _ledger.safeTransferFrom(from, to, _coinId, amount, data);
+        _ledger.deployedTokenTransfer(from, to, _coinId, amount);
         return true;
     }
 

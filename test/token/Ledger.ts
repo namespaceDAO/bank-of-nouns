@@ -5,24 +5,27 @@ import { Contract } from 'ethers'
 
 const parseEther = ethers.utils.parseEther
 
-describe('CoinReserve', () => {
+// TODO: test approval for all
+// TODO: test allowances
+
+describe('Ledger', () => {
   let origin: SignerWithAddress
   let alice: SignerWithAddress
   let bob: SignerWithAddress
-  let reserve: Contract
+  let ledger: Contract
 
   const BASE_URI = 'https://bankofnouns.com/_/api/tokens/{id}.json'
 
-  it('Create coin reserve', async () => {
+  it('Create coin ledger', async () => {
     [origin, alice, bob] = await ethers.getSigners()
-    const Reserve = await ethers.getContractFactory('MockReserve')
-    reserve = await Reserve.deploy(BASE_URI)
+    const Ledger = await ethers.getContractFactory('MockLedger')
+    ledger = await Ledger.deploy(BASE_URI)
 
-    const supply = await reserve.totalSupply()
-    const balance = await reserve.treasuryBalance()
-    const address = await reserve.treasurerAddress()
-    const supply1 = await reserve.totalSupplyOf(1)
-    const rate = await reserve.conversionRate(1, parseEther('1'))
+    const supply = await ledger.totalSupply()
+    const balance = await ledger.treasuryBalance()
+    const address = await ledger.treasurerAddress()
+    const supply1 = await ledger.totalSupplyOf(1)
+    const rate = await ledger.conversionRate(1, parseEther('1'))
 
     expect(supply).to.equal(0)
     expect(balance).to.equal(0)
@@ -35,16 +38,16 @@ describe('CoinReserve', () => {
     const amountA = parseEther(`${Math.random()}`)
     const amountB = parseEther(`${Math.random()}`)
 
-    await reserve.mint(alice.address, 1, 0, { value: amountA })
-    await reserve.mint(bob.address, 2, 0, { value: amountB })
+    await ledger.mint(alice.address, 1, 0, { value: amountA })
+    await ledger.mint(bob.address, 2, 0, { value: amountB })
 
-    const totalSupply = await reserve.totalSupply()
+    const totalSupply = await ledger.totalSupply()
 
-    const balanceA = await reserve.balanceOf(alice.address, 1)
-    const balanceB = await reserve.balanceOf(bob.address, 2)
+    const balanceA = await ledger.balanceOf(alice.address, 1)
+    const balanceB = await ledger.balanceOf(bob.address, 2)
 
-    const supplyA = await reserve.totalSupplyOf(1)
-    const supplyB = await reserve.totalSupplyOf(2)
+    const supplyA = await ledger.totalSupplyOf(1)
+    const supplyB = await ledger.totalSupplyOf(2)
 
     expect(balanceA).to.equal(amountA)
     expect(balanceB).to.equal(amountB)
