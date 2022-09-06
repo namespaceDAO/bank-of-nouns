@@ -17,10 +17,8 @@ describe('Bank', () => {
 
   before(async () => {
     [origin, alice, bob] = await ethers.getSigners()
-    const Reserve = await ethers.getContractFactory('MockLedger')
     const Bank = await ethers.getContractFactory('MockBank')
-    reserve = await Reserve.deploy(BASE_URI)
-    bank = await Bank.deploy(reserve.address)
+    bank = await Bank.deploy(BASE_URI)
   })
 
   it('Deploy token', async () => {
@@ -35,12 +33,16 @@ describe('Bank', () => {
 
   it('Transfers coin', async () => {
     const amountA = parseEther(`${Math.random()}`)
-    await reserve.mint(alice.address, 1, 0, { value: amountA })
+    await bank.mint(alice.address, 1, 0, { value: amountA })
 
+    const balanceA1 = await coin1.balanceOf(alice.address)
     await coin1.connect(alice).transfer(bob.address, amountA)
 
     const balanceA = await coin1.balanceOf(alice.address)
     const balanceB = await coin1.balanceOf(bob.address)
+
+    expect(balanceA).to.equal(0)
+    expect(balanceB).to.equal(balanceA1)
 
     console.log({
       balanceA, balanceB

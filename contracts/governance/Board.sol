@@ -49,11 +49,11 @@ abstract contract Board {
         v.support = vote.support;
 
         // TODO: ensure that we dont allow double counting of votes
-        uint total = _coin.conversionRate(v.coinId, v.amount);
-        if (vote.support) {
-            _totalSupport[vote.id] += total;
-        } else {
-            _totalAgainst[vote.id] += total;
-        }
+        // uint total = _coin.conversionRate(v.coinId, v.amount);
+        // if (vote.support) {
+        //     _totalSupport[vote.id] += total;
+        // } else {
+        //     _totalAgainst[vote.id] += total;
+        // }
     }
 }

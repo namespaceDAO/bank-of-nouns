@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../token/Bank.sol";
 import "../token/Claimable.sol";
+import "../token/Oracle.sol";
+import "../token/Bank.sol";
 import "./NounsDescriptor.sol";
 
 // TODO: deep fry the horse
 
-contract NounBank is Claimable, Bank {
+contract NounBank is Claimable, Oracle, Bank {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
+
+    function decimals() public view override returns (uint8) {
+        return oracleDecimals();
+    }
 
     function descriptor() public view returns (NounsDescriptor) {
         return _desc;
@@ -69,27 +74,28 @@ contract NounBank is Claimable, Bank {
         uint totalSupply = totalSupply();
         if (totalSupply == 0) {
             require(value * 2 >= heads, "Not enough coins");
-            return value;  // seppuku mint;
+            return convertValueAtOraclePrice(value);  // seppuku mint;
         }
 
         uint avgSupply = totalSupply / heads;
         uint tokenSupply = totalSupplyOf(coinId);
 
         if (tokenSupply > avgSupply * _ampl / 10000) {
-            return value / (_ampl / 10000);
+            return convertValueAtOraclePrice(value / (_ampl / 10000));
         }
 
         if (avgSupply > tokenSupply * _ampl / 10000) {
-            return value * _ampl / 10000;
+            return convertValueAtOraclePrice(value * _ampl / 10000);
         }
 
-        return value * avgSupply / tokenSupply;
+        return convertValueAtOraclePrice(value * avgSupply / tokenSupply);
     }
 
     constructor(
+        OracleInterface oracle_,
         string memory baseURI_,
         NounsDescriptor desc_
-    ) Bank(baseURI_) { 
+    ) Oracle(oracle_) Bank(baseURI_) { 
         _desc = desc_; 
     }
 }

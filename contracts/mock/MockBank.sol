@@ -16,12 +16,9 @@ contract MockBank is Bank {
         return 1;
     }
 
-    function deployedTokenTransfer(
-        address from, 
-        address to, 
-        uint coinId, 
-        uint amount
-    ) override external {}
+    function decimals() override public pure returns (uint8) {
+        return 18;
+    }
 
     constructor(string memory baseURI_) Bank(baseURI_) {}    
 }

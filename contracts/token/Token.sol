@@ -23,8 +23,8 @@ contract Token is IERC20 {
         return _symbol;
     }
 
-    function decimals() external pure returns (uint8) {
-        return 18;
+    function decimals() external view returns (uint8) {
+        return _ledger.decimals();
     }
 
     function totalSupply() external view returns (uint) {

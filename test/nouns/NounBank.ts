@@ -11,6 +11,7 @@ describe('NounBank', () => {
   let alice: SignerWithAddress
   let bob: SignerWithAddress
   let coin: Contract
+  let oracle: Contract
   let descriptor: Contract
   const COIN_URI = 'https://nouns.express/_/api/tokens/{id}.json'
   const bps = 10000
@@ -19,8 +20,10 @@ describe('NounBank', () => {
     [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
     const NounBank = await ethers.getContractFactory('NounBank')
+    const Oracle = await ethers.getContractFactory('DollarOracle')
     descriptor = await MockDescriptor.deploy(2)
-    coin = await NounBank.deploy(COIN_URI, descriptor.address)
+    oracle = await Oracle.deploy()
+    coin = await NounBank.deploy(oracle.address, COIN_URI, descriptor.address)
   })
 
   it('Create NOUN COIN with getters', async () => {
@@ -66,33 +69,37 @@ describe('NounBank', () => {
     const value = parseEther('1')
 
     const ampl = await randomizeAmpl()
+    const price = await coin.convertValueAtOraclePrice(value)
+
     await coin.mint(alice.address, 0, 0, { value })
     await coin.mint(bob.address, 1, 0, { value })
 
     const balanceA = await coin.balanceOf(alice.address, 0)
     const balanceB = await coin.balanceOf(bob.address, 1)
 
-    expect(balanceA).to.equal(value)
-    expect(balanceB).to.equal(value.mul(ampl).div(bps))
+    expect(balanceA).to.equal(price)
+    expect(balanceB).to.equal(price.mul(ampl).div(bps))
   })
 
   it('Mint price stays constant with equal coin supplies', async () => {
     const value = parseEther('1')
 
     await randomizeAmpl()
+    const price = await coin.convertValueAtOraclePrice(value)
+
     await coin.mintBatch(alice.address, [0, 1], 0, { value })
 
     const balanceA = await coin.balanceOf(alice.address, 0)
     const balanceB = await coin.balanceOf(alice.address, 1)
 
-    expect(balanceA).to.equal(value.div(2)) // initial mint
-    expect(balanceB).to.equal(value.div(2))
+    expect(balanceA).to.equal(price.div(2)) // initial mint
+    expect(balanceB).to.equal(price.div(2))
 
     await randomizeAmpl()
     await coin.mint(alice.address, 0, 0, { value })
 
     const balanceA1 = await coin.balanceOf(alice.address, 0)
-    const balanceE1 = value.add(value.div(2))
+    const balanceE1 = price.add(price.div(2))
     expect(balanceA1).to.equal(balanceE1)
   })
 
@@ -100,6 +107,9 @@ describe('NounBank', () => {
     const value1 = parseEther('1')
     const value2 = parseEther('1')
 
+    const price1 = await coin.convertValueAtOraclePrice(value1)
+    const price2 = await coin.convertValueAtOraclePrice(value2)
+
     const ampl = await randomizeAmpl()
     await coin.mint(alice.address, 0, 0, { value: value1 })
     await coin.mint(alice.address, 1, 0, { value: value2 })
@@ -107,14 +117,17 @@ describe('NounBank', () => {
     const balanceA = await coin.balanceOf(alice.address, 0)
     const balanceB = await coin.balanceOf(alice.address, 1)
 
-    expect(balanceA).to.equal(value1)
-    expect(balanceB).to.equal(value2.mul(ampl).div(bps)) // discount because other was minted
+    expect(balanceA).to.equal(price1)
+    expect(balanceB).to.equal(price2.mul(ampl).div(bps)) // discount because other was minted
   })
 
   it('Mints less of one then the other', async () => {
     const value1 = parseEther('0.5')
     const value2 = parseEther('1')
 
+    const price1 = await coin.convertValueAtOraclePrice(value1)
+    const price2 = await coin.convertValueAtOraclePrice(value2)
+
     const ampl = await randomizeAmpl()
     await coin.mint(alice.address, 0, 0, { value: value1 })
     await coin.mint(alice.address, 1, 0, { value: value2 })
@@ -122,8 +135,8 @@ describe('NounBank', () => {
     const balanceA = await coin.balanceOf(alice.address, 0)
     const balanceB = await coin.balanceOf(alice.address, 1)
 
-    expect(balanceA).to.equal(value1)
-    expect(balanceB).to.equal(value2.mul(ampl).div(bps)) // discount because other was minted
+    expect(balanceA).to.equal(price1)
+    expect(balanceB).to.equal(price2.mul(ampl).div(bps)) // discount because other was minted
   })
 
   it('Fails to mint with incorrect number of heads', async () => {
@@ -136,10 +149,12 @@ describe('NounBank', () => {
 
   it('Empty conversion rates', async () => {
     const value = parseEther('1')
+    const price = await coin.convertValueAtOraclePrice(value)
+
     const rate1 = await coin.conversionRate(0, value)
     const rate2 = await coin.conversionRate(1, value)
-    expect(rate1).to.equal(value) // 1 = 1
-    expect(rate2).to.equal(value) // 1 = 1
+    expect(rate1).to.equal(price) // 1 = 1 at the oracle price
+    expect(rate2).to.equal(price) // 1 = 1 at the oracle price
   })
 
   it('Fails to mint zero coins', async () => {
@@ -160,6 +175,7 @@ describe('NounBank games 1', () => {
   let alice: SignerWithAddress
   let bob: SignerWithAddress
   let coin: Contract
+  let oracle: Contract
   let descriptor: Contract
   const COIN_URI = 'https://nouns.express/_/api/tokens/{id}.json'
   const bps = 10000
@@ -168,8 +184,10 @@ describe('NounBank games 1', () => {
     [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
     const NounBank = await ethers.getContractFactory('NounBank')
+    const Oracle = await ethers.getContractFactory('DollarOracle')
+    oracle = await Oracle.deploy()
     descriptor = await MockDescriptor.deploy(200)
-    coin = await NounBank.deploy(COIN_URI, descriptor.address)
+    coin = await NounBank.deploy(oracle.address, COIN_URI, descriptor.address)
   })
 
   const randomizeAmpl = async () => {
@@ -193,8 +211,13 @@ describe('NounBank games 1', () => {
     const coinsB = fillArray(50, (i) => i * 2 + 1)
     await coin.mintBatch(bob.address, coinsB, 0, { value: valueB })
 
-    expect(await coin.balanceOf(alice.address, 0)).to.equal(parseEther('1'))
-    expect(await coin.balanceOf(bob.address, 1)).to.equal(parseEther('2'))
+    const value1a = parseEther('1')
+    const value2a = parseEther('2')
+    const price1a = await coin.convertValueAtOraclePrice(value1a)
+    const price2a = await coin.convertValueAtOraclePrice(value2a)
+
+    expect(await coin.balanceOf(alice.address, 0)).to.equal(price1a)
+    expect(await coin.balanceOf(bob.address, 1)).to.equal(price2a)
 
     // alice again with 50 ETH for 50 coins
     await coin.mintBatch(alice.address, coinsA, 0, { value: valueA })
@@ -205,7 +228,12 @@ describe('NounBank games 1', () => {
     const balanceA = await coin.balanceOf(alice.address, 0)
     const balanceB = await coin.balanceOf(bob.address, 1)
 
-    expect(balanceA).to.equal(parseEther('1.75'))
-    expect(balanceB).to.equal(parseEther('27'))
+    const value1 = parseEther('1.75')
+    const value2 = parseEther('27')
+    const price1 = await coin.convertValueAtOraclePrice(value1)
+    const price2 = await coin.convertValueAtOraclePrice(value2)
+
+    expect(balanceA).to.equal(price1)
+    expect(balanceB).to.equal(price2)
   })
 })

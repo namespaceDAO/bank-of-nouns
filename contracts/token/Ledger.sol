@@ -4,6 +4,8 @@ pragma solidity ^0.8.10;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./Treasury.sol";
 
+// TODO: spend allowance
+
 abstract contract Ledger is Treasury, ERC1155 {
     uint private _bank;
     uint private _totalSupply;
@@ -29,6 +31,8 @@ abstract contract Ledger is Treasury, ERC1155 {
         uint amount
     ) virtual external;
 
+    function decimals() virtual public view returns (uint8);
+
     function totalSupply() public view returns (uint) {
         return _totalSupply;
     }
@@ -38,7 +42,7 @@ abstract contract Ledger is Treasury, ERC1155 {
     }
 
     function _beforeTokenTransfer(
-        address,
+        address to,
         address from,
         address,
         uint[] memory ids,
@@ -47,7 +51,8 @@ abstract contract Ledger is Treasury, ERC1155 {
     ) internal override {
         if (from != address(0)) {
             for (uint i = 0; i < ids.length; i++) {
-                _spendAllowance(from, msg.sender, ids[i], amounts[i]);
+                // TODO
+                // _spendAllowance(from, to, ids[i], amounts[i]);
             }
         }
     }

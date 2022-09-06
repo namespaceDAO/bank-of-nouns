@@ -11,6 +11,7 @@ describe('AdventureFund', () => {
   let bob: SignerWithAddress
   let govt: Contract
   let coin: Contract
+  let oracle: Contract
   let descriptor: Contract
   const COIN_URI = 'https://nouns.express/_/api/tokens/{id}.json'
 
@@ -30,11 +31,12 @@ describe('AdventureFund', () => {
   before(async () => {
     [origin, alice, bob] = await ethers.getSigners()
     const MockDescriptor = await ethers.getContractFactory('MockDescriptor')
+    const Oracle = await ethers.getContractFactory('DollarOracle')
     const NounCoin = await ethers.getContractFactory('NounBank')
     const VentureFund = await ethers.getContractFactory('AdventureFund')
     descriptor = await MockDescriptor.deploy(2)
-    coin = await NounCoin.deploy(COIN_URI, descriptor.address)
-
+    oracle = await Oracle.deploy()
+    coin = await NounCoin.deploy(oracle.address, COIN_URI, descriptor.address)
     govt = await VentureFund.deploy(coin.address)
   })
 

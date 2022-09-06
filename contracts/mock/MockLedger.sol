@@ -16,6 +16,10 @@ contract MockLedger is Ledger {
         return 1;
     }
 
+    function decimals() override public pure returns (uint8) {
+        return 18;
+    }
+
     function deployedTokenTransfer(
         address from, 
         address to, 
