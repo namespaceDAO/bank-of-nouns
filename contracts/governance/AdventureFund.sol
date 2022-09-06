@@ -3,13 +3,13 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../token/CoinMint.sol";
+import "../token/Ledger.sol";
 import "./Board.sol";
 import "./Portfolio.sol";
 
 // What being has four legs, then two, and then three?
 contract AdventureFund is Ownable, Pausable, Board, Portfolio {
-    CoinMint private _coin;
+    Ledger private _coin;
 
     function _meetsQuorum(uint prop, bool start) internal view returns (bool) {
         uint startCash; uint endCash;
@@ -59,7 +59,7 @@ contract AdventureFund is Ownable, Pausable, Board, Portfolio {
         _unpause();
     }
 
-    constructor(CoinMint coin_) {
+    constructor(Ledger coin_) {
         _coin = coin_;
     }
 }

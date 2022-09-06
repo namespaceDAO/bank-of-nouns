@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.10;
 
-import "../token/CoinMint.sol";
+import "../token/Ledger.sol";
 import "../token/Claimable.sol";
 import "./NounsDescriptor.sol";
 
-contract NounCoin is Claimable, CoinMint {
+contract NounCoin is Claimable, Ledger {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
 
@@ -84,7 +84,7 @@ contract NounCoin is Claimable, CoinMint {
     constructor(
         string memory baseURI_,
         NounsDescriptor desc_
-    ) CoinMint(baseURI_) { 
+    ) Ledger(baseURI_) { 
         _desc = desc_; 
     }
 }
