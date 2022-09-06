@@ -5,6 +5,8 @@ import "../token/Ledger.sol";
 import "../token/Claimable.sol";
 import "./NounsDescriptor.sol";
 
+// TODO: deep fry the horse
+
 contract NounCoin is Claimable, Ledger {
     NounsDescriptor private _desc;
     uint private _ampl = 20000;  // basis points
@@ -30,8 +32,9 @@ contract NounCoin is Claimable, Ledger {
         uint coinId, 
         bytes memory data
     ) external payable {
-        require(msg.value > 0, "NounCoin: must mint some coins");
+        require(msg.value > 0, "Must mint some coins");
         uint amount = conversionRate(coinId, msg.value);
+        
         _mint(to, coinId, amount, data);
         _addValue(msg.value);
     }
@@ -41,7 +44,7 @@ contract NounCoin is Claimable, Ledger {
         uint[] memory ids,
         bytes memory data
     ) external payable {
-        require(msg.value > 0, "NounCoin: must mint some coins");
+        require(msg.value > 0, "Must mint some coins");
         
         uint split = msg.value / ids.length;
         uint[] memory amounts = new uint[](ids.length);
@@ -58,6 +61,8 @@ contract NounCoin is Claimable, Ledger {
         uint coinId, 
         uint value
     ) public view override returns (uint) {
+        require(coinId != 101, "Deep fried");
+
         uint heads = _desc.headCount();
         require(heads > 0 && coinId < heads, "Not enough heads");
 

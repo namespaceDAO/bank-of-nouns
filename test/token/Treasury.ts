@@ -3,6 +3,8 @@ import { expect } from 'chai'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Contract } from 'ethers'
 
+// TODO: test transferTokenFromTreasury
+
 describe('Treasury', () => {
   let origin: SignerWithAddress
   let treasurer: SignerWithAddress
@@ -40,7 +42,7 @@ describe('Treasury', () => {
     const treasury1 = await treasury.treasuryBalance()
 
     const transfer = ethers.utils.parseEther(`${Math.random()}`)
-    await treasury.connect(treasurer).transferFromTreasury(bob.address, transfer)
+    await treasury.connect(treasurer).transferValueFromTreasury(bob.address, transfer)
 
     const balance2 = await bob.getBalance()
     const treasury2 = await treasury.treasuryBalance()
@@ -52,14 +54,14 @@ describe('Treasury', () => {
     const balance = await treasury.treasuryBalance()
     const tooMuch = balance.mul(2)
     await expect(
-      treasury.connect(treasurer).transferFromTreasury(origin.address, tooMuch)
+      treasury.connect(treasurer).transferValueFromTreasury(origin.address, tooMuch)
     ).to.revertedWith('Treasury: transfer exceeds treasury balance')
   })
 
   it('Fails to transfer funds when not treasurer', async () => {
     const value = ethers.utils.parseEther(`${Math.random()}`)
     await expect(
-      treasury.transferFromTreasury(bob.address, value)
+      treasury.transferValueFromTreasury(bob.address, value)
     ).to.revertedWith('Treasury: caller is not the treasurer')
   })
 
@@ -84,6 +86,6 @@ describe('Treasury', () => {
 
   it('Transfers when locked', async () => {
     const transfer = ethers.utils.parseEther(`${Math.random() / 10}`)
-    await treasury.connect(treasurer).transferFromTreasury(bob.address, transfer)
+    await treasury.connect(treasurer).transferValueFromTreasury(bob.address, transfer)
   })
 })

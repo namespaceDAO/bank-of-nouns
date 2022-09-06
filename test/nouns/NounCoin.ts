@@ -147,11 +147,11 @@ describe('NounCoin', () => {
 
     await expect(
       coin.mint(alice.address, 0, 0, { value: amount })
-    ).to.revertedWith('NounCoin: must mint some coins')
+    ).to.revertedWith('Must mint some coins')
 
     await expect(
       coin.mintBatch(alice.address, [0, 1], 0, { value: amount })
-    ).to.revertedWith('NounCoin: must mint some coins')
+    ).to.revertedWith('Must mint some coins')
   })
 })
 

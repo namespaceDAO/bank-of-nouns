@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Treasury is Ownable {
@@ -30,7 +31,15 @@ contract Treasury is Ownable {
         return _treasurer;
     }
 
-    function transferFromTreasury(
+    function transferTokenFromTreasury(
+        IERC20 token,
+        address to, 
+        uint amount
+    ) external onlyTreasurer {
+        token.transferFrom(address(this), to, amount);
+    }
+
+    function transferValueFromTreasury(
         address to, 
         uint amount
     ) external onlyTreasurer {

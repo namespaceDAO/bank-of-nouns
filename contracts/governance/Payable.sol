@@ -73,7 +73,7 @@ abstract contract Payable {
   function _payStart(uint id) internal {
     Fund storage fund = _funds[id];
 
-    _coin.transferFromTreasury(fund.payee, fund.startCash);
+    _coin.transferValueFromTreasury(fund.payee, fund.startCash);
 
     emit PaidStart(
       id, 
@@ -85,7 +85,7 @@ abstract contract Payable {
   function _payEnd(uint id) internal {
     Fund storage fund = _funds[id];
 
-    _coin.transferFromTreasury(fund.payee, fund.endCash);
+    _coin.transferValueFromTreasury(fund.payee, fund.endCash);
 
     emit PaidEnd(
       id, 
