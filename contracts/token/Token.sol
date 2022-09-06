@@ -47,8 +47,8 @@ contract Token is IERC20 {
         return true;
     }
 
-    function allowance(address owner, address spender) external view returns (uint) {
-        return _ledger.allowance(owner, spender, _coinId);
+    function allowance(address account, address spender) external view returns (uint) {
+        return _ledger.allowance(account, spender, _coinId);
     }
 
     function approve(address spender, uint amount) external returns (bool) {

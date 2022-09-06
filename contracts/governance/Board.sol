@@ -29,9 +29,9 @@ abstract contract Board {
         return support - against;
     }
 
-    function _requireBalance(address owner, uint coinId, uint amount) internal view {
+    function _requireBalance(address account, uint coinId, uint amount) internal view {
         require(
-            _coin.balanceOf(owner, coinId) >= amount, 
+            _coin.balanceOf(account, coinId) >= amount, 
             "You do not have enough of that coin"
         );
     }

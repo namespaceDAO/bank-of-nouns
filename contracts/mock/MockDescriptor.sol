@@ -7,7 +7,7 @@ import "../nouns/NounCoin.sol";
 contract MockDescriptor is NounsDescriptor {
     uint private _heads;
 
-    function heads(uint256) external pure returns (bytes memory) {
+    function heads(uint) external pure returns (bytes memory) {
         bytes memory data;
         return data;
     }

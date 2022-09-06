@@ -15,6 +15,6 @@ pragma solidity ^0.8.10;
  *********************************/
 
 interface NounsDescriptor {
-    function heads(uint256 index) external view returns (bytes memory);
-    function headCount() external view returns (uint256);
+    function heads(uint index) external view returns (bytes memory);
+    function headCount() external view returns (uint);
 }

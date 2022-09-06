@@ -10,7 +10,7 @@ abstract contract Ledger is ERC1155, Treasury {
     mapping(address => mapping(address => mapping(uint => uint))) private _allowances;
 
     event Approval(
-        address indexed owner, 
+        address indexed account, 
         address indexed spender, 
         uint indexed coinId, 
         uint value
@@ -33,12 +33,14 @@ abstract contract Ledger is ERC1155, Treasury {
         address,
         address from,
         address,
-        uint256[] memory ids,
-        uint256[] memory amounts,
+        uint[] memory ids,
+        uint[] memory amounts,
         bytes memory
     ) internal override {
-        for (uint i = 0; i < ids.length; i++) {
-            _spendAllowance(from, msg.sender, ids[i], amounts[i]);
+        if (from != address(0)) {
+            for (uint i = 0; i < ids.length; i++) {
+                _spendAllowance(from, msg.sender, ids[i], amounts[i]);
+            }
         }
     }
 
@@ -46,8 +48,8 @@ abstract contract Ledger is ERC1155, Treasury {
         address,
         address from,
         address,
-        uint256[] memory ids,
-        uint256[] memory amounts,
+        uint[] memory ids,
+        uint[] memory amounts,
         bytes memory
     ) internal override {
         if (from == address(0)) {
@@ -61,11 +63,11 @@ abstract contract Ledger is ERC1155, Treasury {
     }
 
     function allowance(
-        address owner, 
+        address account, 
         address spender, 
         uint coinId
     ) external view returns (uint) {
-        return _allowances[owner][spender][coinId];
+        return _allowances[account][spender][coinId];
     }
 
     function approve(
@@ -77,27 +79,32 @@ abstract contract Ledger is ERC1155, Treasury {
     }
 
     function _approve(
-        address owner,
+        address account,
         address spender,
         uint coinId,
         uint amount
     ) internal {
-        require(owner != address(0), "Ledger: approve from the zero address");
+        require(account != address(0), "Ledger: approve from the zero address");
         require(spender != address(0), "Ledger: approve to the zero address");
 
-        _allowances[owner][spender][coinId] = amount;
-        emit Approval(owner, spender, coinId, amount);
+        _allowances[account][spender][coinId] = amount;
+        emit Approval(account, spender, coinId, amount);
     }
 
     function _spendAllowance(
-        address owner,
+        address account,
         address spender,
         uint coinId,
         uint amount
     ) internal virtual {
-        uint currentAllowance = _allowances[owner][spender][coinId];
+        uint256 currentAllowance = _allowances[account][spender][coinId];
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "Ledger: insufficient allowance");
+            unchecked {
+                _approve(account, spender, coinId, currentAllowance - amount);
+            }
+        }
 
-        // TODO
     }
 
     constructor(string memory baseURI_) ERC1155(baseURI_) {}  
